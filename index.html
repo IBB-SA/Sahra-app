@@ -462,8 +462,8 @@ function renderLanding(){
   return `<div class="card" style="max-width:360px;margin:60px auto;text-align:center;">
     <div style="display:flex;justify-content:center;color:var(--accent-text);margin-bottom:6px;">${icon('pot')}</div><h2 style="color:var(--accent-text);margin-bottom:6px;">سهرة</h2>
     <div style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">نظّم مناسباتكم الأسبوعية بكل سهولة</div>
-    ${tripsIndex.length ? `<button class="primary" id="goSelectBtn" style="width:100%;margin-bottom:10px;justify-content:center;">${icon('key')}لدي كود طلعة</button>` : ''}
-    <button class="${tripsIndex.length ? 'sm' : 'primary'}" id="goCreateBtn" style="width:100%;justify-content:center;">${icon('plus')}إنشاء طلعة جديدة</button>
+    <button class="primary" id="goSelectBtn" style="width:100%;margin-bottom:10px;justify-content:center;">${icon('key')}لدي كود طلعة</button>
+    <button id="goCreateBtn" style="width:100%;justify-content:center;">${icon('plus')}إنشاء طلعة جديدة</button>
   </div>`;
 }
 function attachLandingEvents(){
