@@ -284,6 +284,7 @@ let tripsIndex = [];
 let landingMode = 'choose';
 let landingError = '';
 let landingSelectedTripId = '';
+let landingFoundTrip = null;
 let themeMode = 'dark';
 
 function applyTheme(){
@@ -344,7 +345,7 @@ async function createNewTrip(name){
     showAlert('تعذر إنشاء الطلعة، تأكد من اتصالك بالنت وحاول مرة ثانية');
     return;
   }
-  tripsIndex.push({ id, name });
+  tripsIndex.push({ id, name, code: newState.tripCode });
   await saveTripsIndex();
   state = newState; currentTripId = id; unlocked = true; landingMode='choose';
   render();
@@ -353,7 +354,7 @@ async function createNewTrip(name){
 
 async function switchTrip(){
   unlocked = false; currentTripId = null; state = null; currentUserId = null; homeOccId = null;
-  landingMode = 'choose'; landingError = ''; landingSelectedTripId = '';
+  landingMode = 'choose'; landingError = ''; landingSelectedTripId = ''; landingFoundTrip = null;
   await loadApp();
 }
 async function saveState(){
@@ -484,16 +485,28 @@ function renderLanding(){
   if(landingMode === 'select'){
     return `<div class="card" style="max-width:360px;margin:60px auto;text-align:center;">
       <div style="display:flex;justify-content:center;color:var(--accent-text);margin-bottom:6px;">${icon('key')}</div><h2 style="color:var(--accent-text);margin-bottom:6px;">الدخول لطلعة</h2>
-      <div style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">اختر طلعتك وأدخل كودها</div>
-      <label class="field-label" for="tripSelect" style="text-align:right;">اسم الطلعة</label>
-      <select id="tripSelect" style="width:100%;margin-bottom:10px;">
-        <option value="">اختر اسم الطلعة</option>
-        ${tripsIndex.map(t=>`<option value="${escAttr(t.id)}" ${t.id===landingSelectedTripId?'selected':''}>${esc(t.name)}</option>`).join('')}
-      </select>
-      <label class="field-label" for="tripCodeInput" style="text-align:right;">كود الطلعة</label>
+      <div style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">اكتب كود الطلعة</div>
       <input type="text" id="tripCodeInput" placeholder="كود الطلعة" maxlength="6" inputmode="numeric" style="width:100%;text-align:center;font-size:18px;letter-spacing:4px;margin-bottom:10px;">
-      <button class="primary" id="unlockBtn" style="width:100%;margin-bottom:8px;justify-content:center;">${icon('lock')}دخول</button>
+      <button class="primary" id="findTripBtn" style="width:100%;margin-bottom:8px;justify-content:center;">${icon('lock')}تحقق من الكود</button>
       <div id="lockError" style="color:var(--red);font-size:12.5px;margin:8px 0;">${esc(landingError)}</div>
+      <button class="sm ghost" id="backToChooseBtn" style="width:100%;justify-content:center;">رجوع</button>
+    </div>`;
+  }
+  if(landingMode === 'memberLogin' && landingFoundTrip){
+    const data = landingFoundTrip.data;
+    return `<div class="card" style="max-width:360px;margin:60px auto;text-align:center;">
+      <div style="display:flex;justify-content:center;color:var(--accent-text);margin-bottom:6px;">${icon('users')}</div>
+      <h2 style="color:var(--accent-text);margin-bottom:4px;">${esc(data.tripName)}</h2>
+      <div style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">اختر اسمك وأدخل كودك الخاص</div>
+      <label class="field-label" for="memberLoginSelect" style="text-align:right;">اسمك</label>
+      <select id="memberLoginSelect" style="width:100%;margin-bottom:10px;">
+        <option value="">اختر اسمك</option>
+        ${data.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}
+      </select>
+      <label class="field-label" for="memberLoginCode" style="text-align:right;">كودك الخاص</label>
+      <input type="text" id="memberLoginCode" placeholder="كودك الخاص" maxlength="4" inputmode="numeric" style="width:100%;text-align:center;font-size:18px;letter-spacing:4px;margin-bottom:10px;">
+      <button class="primary" id="memberLoginBtn" style="width:100%;margin-bottom:8px;justify-content:center;">${icon('lock')}دخول</button>
+      <div id="memberLoginError" style="color:var(--red);font-size:12.5px;margin:8px 0;">${esc(landingError)}</div>
       <button class="sm ghost" id="backToChooseBtn" style="width:100%;justify-content:center;">رجوع</button>
     </div>`;
   }
@@ -507,7 +520,7 @@ function renderLanding(){
 function attachLandingEvents(){
   const backToChooseBtn = document.getElementById('backToChooseBtn');
   if(backToChooseBtn){
-    backToChooseBtn.addEventListener('click', ()=>{ landingMode='choose'; landingError=''; render(); });
+    backToChooseBtn.addEventListener('click', ()=>{ landingMode='choose'; landingError=''; landingFoundTrip=null; render(); });
   }
   if(landingMode === 'create'){
     document.getElementById('createTripBtn').addEventListener('click', ()=>{
@@ -519,25 +532,42 @@ function attachLandingEvents(){
     return;
   }
   if(landingMode === 'select'){
-    const unlockBtn = document.getElementById('unlockBtn');
-    const tryUnlock = async ()=>{
-      const tid = document.getElementById('tripSelect').value;
+    const findTripBtn = document.getElementById('findTripBtn');
+    const tryFind = async ()=>{
       const code = document.getElementById('tripCodeInput').value.trim();
-      landingSelectedTripId = tid;
-      if(!tid){ landingError='اختر اسم الطلعة أولًا'; render(); return; }
+      if(!code){ landingError='اكتب كود الطلعة'; render(); return; }
       landingError = 'جارٍ التحقق...'; render();
+      const match = tripsIndex.find(t=>t.code === code);
+      if(!match){ landingError='ما فيه طلعة بهذا الكود'; render(); return; }
       try{
-        const res = await storageGet(tripDataKey(tid), true);
+        const res = await storageGet(tripDataKey(match.id), true);
         const data = JSON.parse(res.value);
-        if(data.tripCode === code){
-          state = data; currentTripId = tid; unlocked = true; landingError='';
-          render();
-        } else { landingError='الكود غير صحيح'; render(); }
+        if(data.tripCode !== code){ landingError='ما فيه طلعة بهذا الكود'; render(); return; }
+        landingFoundTrip = { id: match.id, data };
+        landingMode = 'memberLogin'; landingError='';
+        render();
       }catch(e){ landingError='تعذر العثور على بيانات هذي الطلعة'; render(); }
     };
-    unlockBtn.addEventListener('click', tryUnlock);
-    document.getElementById('tripCodeInput').addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
-    setTimeout(()=>document.getElementById('tripSelect')?.focus(), 30);
+    findTripBtn.addEventListener('click', tryFind);
+    document.getElementById('tripCodeInput').addEventListener('keydown', e=>{ if(e.key==='Enter') tryFind(); });
+    setTimeout(()=>document.getElementById('tripCodeInput')?.focus(), 30);
+    return;
+  }
+  if(landingMode === 'memberLogin'){
+    const memberLoginBtn = document.getElementById('memberLoginBtn');
+    const tryMemberLogin = ()=>{
+      const mid = document.getElementById('memberLoginSelect').value;
+      const code = document.getElementById('memberLoginCode').value.trim();
+      if(!mid){ landingError='اختر اسمك أولًا'; render(); return; }
+      const m = landingFoundTrip.data.members.find(x=>x.id===mid);
+      if(!m || m.code !== code){ landingError='الكود الشخصي غير صحيح'; render(); return; }
+      state = landingFoundTrip.data; currentTripId = landingFoundTrip.id; currentUserId = mid;
+      unlocked = true; landingError=''; landingFoundTrip = null;
+      render();
+    };
+    memberLoginBtn.addEventListener('click', tryMemberLogin);
+    document.getElementById('memberLoginCode').addEventListener('keydown', e=>{ if(e.key==='Enter') tryMemberLogin(); });
+    setTimeout(()=>document.getElementById('memberLoginSelect')?.focus(), 30);
     return;
   }
   const goSelectBtn = document.getElementById('goSelectBtn');
@@ -618,6 +648,12 @@ function renderContent(){
   hydrateImages();
 }
 
+function isCurrentHost(occ){
+  if(!currentUserId) return false;
+  const p = pairById(occ.hostPairId);
+  return !!(p && p.memberIds.includes(currentUserId));
+}
+
 function renderHome(){
   const occ = getHomeOcc();
   if(!occ){
@@ -633,6 +669,7 @@ function renderHome(){
   if(occ.status==='scheduled' && du <= 4 && du >= 0){
     html += `<div class="banner" style="display:flex;align-items:center;gap:8px;">${icon('bell')}تذكير: باقي <strong>${du===0?'اليوم':du+' يوم'}</strong> على سهرة <strong>${esc(pairLabel(occ.hostPairId))}</strong></div>`;
   }
+  const iAmHost = isCurrentHost(occ);
   html += `<div class="card">
     <h3>${icon('calendar')}السهرة القادمة — الأسبوع ${occ.index+1}</h3>
     <div class="row between">
@@ -642,24 +679,30 @@ function renderHome(){
       </div>
       <span class="badge scheduled">${fmtShort(occ.date)}</span>
     </div>
+    ${iAmHost ? `
     <div class="field" style="margin-top:14px;">
-      <label class="field-label">مكان السهرة</label>
+      <label class="field-label">${icon('pin')}مكان السهرة</label>
       <input type="text" id="locInput" value="${escAttr(occ.location)}" placeholder="مثلاً: الاستراحة، أو اسم مطعم">
     </div>
     <div class="row">
       <button class="sm" id="saveLocBtn">حفظ المكان</button>
       <button class="sm ghost" id="swapBtn">${icon('swap')}تبديل مع اللي بعدهم</button>
-    </div>
+    </div>` : `
+    <div style="margin-top:14px;font-size:13.5px;color:var(--text-dim);">${icon('pin')} ${occ.location ? esc(occ.location) : 'المكان لسا ما تحدد'}</div>
+    `}
   </div>`;
 
   html += `<div class="card">
     <h3>${icon('megaphone')}الدعوة والتصويت</h3>
+    ${iAmHost ? `
     <textarea class="note" id="inviteMsg" placeholder="اكتب رسالة الدعوة...">${esc(occ.inviteMessage || suggestedInvite(occ))}</textarea>
     <div class="row" style="margin-top:8px;">
       <button class="primary sm" id="sendAnnounceBtn">${icon('megaphone')}اعزم</button>
       <button class="sm" id="sendPollBtn">${icon('poll')}خذ رأيهم</button>
       <button class="danger sm" id="openCancelBtn">تأجيل / إلغاء</button>
-    </div>`;
+    </div>` : (occ.inviteSent ? `
+    <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px;">${esc(occ.inviteMessage)}</div>
+    ` : `<div class="empty" style="padding:6px 0;">بانتظار دعوة من ${esc(pairLabel(occ.hostPairId))}</div>`)}`;
 
   if(occ.inviteSent){
     const total = state.members.length;
@@ -690,13 +733,15 @@ function renderHome(){
   if(occ.status==='scheduled'){
     html += `<div class="card">
       <h3>${icon('camera')}توثيق السهرة</h3>
+      ${iAmHost ? `
       <label class="file-btn" for="photoInput">${icon('camera')}<span id="photoFileLabel">اختر صورة</span></label>
       <input type="file" accept="image/*" id="photoInput" style="display:none;">
       ${occ.hasPhoto ? `<img class="photo-preview" data-photo-key="photo:${occ.id}" alt="صورة السهرة">
         <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">وُثّقت بتاريخ ${fmtShort(occ.photoDate)}</div>` : ''}
       <div class="row" style="margin-top:10px;">
         <button class="primary sm" id="markDoneBtn">${icon('check')}تحديد السهرة كمنتهية</button>
-      </div>
+      </div>` : (occ.hasPhoto ? `<img class="photo-preview" data-photo-key="photo:${occ.id}" alt="صورة السهرة">`
+        : `<div class="empty" style="padding:6px 0;">لسا ما وثّق المعازيب السهرة</div>`)}
     </div>`;
   }
 
@@ -709,6 +754,7 @@ function renderHome(){
     const pct = occ.kitty.total ? Math.round(collected/occ.kitty.total*100) : 0;
     html += `<div class="card">
       <h3>${icon('wallet')}محفظة الجلسة</h3>
+      ${iAmHost ? `
       <div class="field">
         <label class="field-label">من حضر هالجلسة؟</label>
         <div class="row">
@@ -720,7 +766,7 @@ function renderHome(){
       <div class="row">
         <input type="number" id="kittyTotal" placeholder="المبلغ الإجمالي (ريال)" value="${occ.kitty.total||''}" style="max-width:180px;">
         <button class="primary sm" id="saveKittyBtn">${icon('wallet')}احسب المحفظة</button>
-      </div>
+      </div>` : ''}
       ${count ? `
         <div class="grid2" style="margin-top:16px;gap:10px;">
           <div style="background:var(--card-2);border-radius:12px;padding:10px 12px;">
@@ -748,7 +794,7 @@ function renderHome(){
               : (currentUserId===mid ? `<button class="sm primary" data-pay="${mid}">أكّد إنك دفعت</button>` : `<span style="color:var(--text-dim);font-size:12.5px;">بانتظار الدفع</span>`)}
           </div>`;
         }).join('')}
-        </div>` : `<div class="empty" style="padding:10px 0 0;">حدد الحضور والمبلغ الإجمالي وبعدين اضغط "احسب المحفظة"</div>`}
+        </div>` : (iAmHost ? `<div class="empty" style="padding:10px 0 0;">حدد الحضور والمبلغ الإجمالي وبعدين اضغط "احسب المحفظة"</div>` : `<div class="empty" style="padding:10px 0 0;">المعازيب لسا ما حسبوا المحفظة</div>`)}
     </div>
 
     <div class="card">
@@ -1143,6 +1189,8 @@ function attachContentEvents(){
       showConfirm('هذا سيمسح كل بيانات هذي الطلعة نهائيًا. متأكد؟', ()=>{
         const keepName = state.tripName;
         state = blankTripState(keepName); currentUserId=null; homeOccId=null; saveState(); render();
+        const idxEntry = tripsIndex.find(t=>t.id===currentTripId);
+        if(idxEntry){ idxEntry.code = state.tripCode; saveTripsIndex(); }
         showAlert(`تم التصفير. كود الدخول الجديد: ${state.tripCode}`);
       });
     });
@@ -1154,6 +1202,8 @@ function attachContentEvents(){
         showConfirm('توليد كود جديد يلغي الكود القديم فورًا لأي شخص ما دخل بعد. متأكد؟', ()=>{
           state.tripCode = genTripCode();
           saveState(); render();
+          const idxEntry = tripsIndex.find(t=>t.id===currentTripId);
+          if(idxEntry){ idxEntry.code = state.tripCode; saveTripsIndex(); }
           showAlert('الكود الجديد: ' + state.tripCode);
         });
       });
