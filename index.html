@@ -10,10 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #FFFFFF; --bg-deep:#FFFFFF; --card:#4E5127; --card-2:#63663A;
-    --amber:#4B4E23; --amber-dim:#DADCC6; --violet:#000000; --coral:#000000; --green:#4B4E23;
-    --red:#000000; --text:#111111; --text-dim:#5B5A44; --line:#DDDCCF;
-    --grad: #000000; --beige:#F2E8D4; --beige-dim:#D6C9A0; --accent-text: var(--amber);
+    --bg: #1B1E27; --bg-deep:#14161D; --card:#22252F; --card-2:#2B2F3B;
+    --amber:#C9A227; --amber-dim:#3E3418; --violet:#2FA894; --coral:#B8564A; --green:#2FA894;
+    --red:#B8564A; --text:#F0EDE4; --text-dim:#8A8F9E; --line:#343946;
+    --grad: #C9A227; --beige:#F0EDE4; --beige-dim:#8A8F9E; --accent-text: var(--amber);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{-webkit-text-size-adjust:100%;}
@@ -41,9 +41,9 @@
     font-weight:500;border:1px solid var(--line);background:var(--card-2);color:var(--text);
     display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;}
   button:active{transform:scale(.97);}
-  button.primary{background:#000;color:#fff;border:none;font-weight:700;}
-  button.primary .icon{color:#fff;}
-  button.danger{border-color:#000;color:#000;background:none;}
+  button.primary{background:var(--grad);color:#14161D;border:none;font-weight:700;}
+  button.primary .icon{color:#14161D;}
+  button.danger{border-color:var(--red);color:var(--red);background:none;}
   button.ghost{background:none;}
   button.sm{padding:8px 12px;font-size:13px;min-height:38px;}
   .icon{width:16px;height:16px;flex-shrink:0;vertical-align:-3px;color:var(--accent-text);}
@@ -56,8 +56,7 @@
   .tab-btn.active{color:#000;border-color:#000;font-weight:700;}
   .tab-btn.active .icon{color:#000;}
   .tab-btn .icon{width:17px;height:17px;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;color:var(--beige);--text:var(--beige);--text-dim:var(--beige-dim);--accent-text:var(--beige);}
-  .card input, .card select, .card textarea{color:#1a1a1a !important;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
   .card h3{font-family:'Tajawal',sans-serif;font-weight:700;font-size:15px;color:#000;margin-bottom:12px;
     display:flex;align-items:center;gap:7px;}
   .card h3 .icon{width:16px;height:16px;color:var(--accent-text);}
@@ -68,8 +67,8 @@
   .row > input, .row > select{flex:1 1 140px;min-width:0;}
   .badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:700;}
   .badge.scheduled{background:var(--card-2);color:var(--text);border:1px solid var(--line);}
-  .badge.done{background:#000;color:#fff;}
-  .badge.canceled{background:#fff;color:#000;border:1px solid #000;text-decoration:line-through;}
+  .badge.done{background:var(--green);color:#14161D;}
+  .badge.canceled{background:none;color:var(--red);border:1px solid var(--red);text-decoration:line-through;}
   .badge.postponed{background:var(--amber-dim);color:var(--amber);}
   .avatar{width:38px;height:38px;border-radius:50%;background:var(--amber);color:#fff;display:flex;
     align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;}
@@ -90,8 +89,8 @@
   .field{margin-bottom:12px;}
   .rsvp-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
   .rsvp-chip{border-radius:20px;padding:6px 12px;font-size:12.5px;border:1px solid var(--line);}
-  .rsvp-chip.yes{background:#000;color:#fff;border-color:#000;}
-  .rsvp-chip.no{background:#fff;color:#000;border-color:#000;}
+  .rsvp-chip.yes{background:var(--green);color:#14161D;border-color:var(--green);}
+  .rsvp-chip.no{background:none;color:var(--red);border-color:var(--red);}
   .rsvp-chip.pending{color:var(--text-dim);}
   .pct-bar{height:8px;border-radius:6px;background:var(--line);overflow:hidden;margin:8px 0;}
   .pct-fill{height:100%;background:var(--grad);}
@@ -123,7 +122,7 @@
   </div>
 </div>
 
-<div id="saveWarningBanner" style="display:none;position:fixed;bottom:16px;left:16px;right:16px;max-width:420px;margin:0 auto;background:#fff;border:1.5px solid #000;color:#000;padding:10px 14px;border-radius:12px;font-size:13px;z-index:998;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 4px 18px rgba(0,0,0,.18);">
+<div id="saveWarningBanner" style="display:none;position:fixed;bottom:16px;left:16px;right:16px;max-width:420px;margin:0 auto;background:#22252F;border:1.5px solid #B8564A;color:#B8564A;padding:10px 14px;border-radius:12px;font-size:13px;z-index:998;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 4px 18px rgba(0,0,0,.35);">
   <span>⚠️ تعذر حفظ آخر تغيير، تأكد من اتصالك بالنت</span>
   <button class="sm" id="retrySaveBtn" style="border-color:var(--red);color:var(--red);flex-shrink:0;">إعادة المحاولة</button>
 </div>
@@ -266,7 +265,7 @@ function genTripCode(){ return String(Math.floor(100000 + Math.random()*900000))
 let unlocked = false;
 let currentTripId = null;
 let tripsIndex = [];
-let landingMode = 'select';
+let landingMode = 'choose';
 let landingError = '';
 let landingSelectedTripId = '';
 
@@ -309,14 +308,14 @@ async function createNewTrip(name){
   }
   tripsIndex.push({ id, name });
   await saveTripsIndex();
-  state = newState; currentTripId = id; unlocked = true; landingMode='select';
+  state = newState; currentTripId = id; unlocked = true; landingMode='choose';
   render();
   showAlert(`تم إنشاء طلعة "${name}". كودها الخاص: ${newState.tripCode} — شاركه مع أعضاء المجموعة عشان يدخلوا.`);
 }
 
 async function switchTrip(){
   unlocked = false; currentTripId = null; state = null; currentUserId = null; homeOccId = null;
-  landingMode = 'select'; landingError = ''; landingSelectedTripId = '';
+  landingMode = 'choose'; landingError = ''; landingSelectedTripId = '';
   await loadApp();
 }
 async function saveState(){
@@ -441,13 +440,13 @@ function renderLanding(){
       <div style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">اختر اسمًا لطلعتك</div>
       <input type="text" id="newTripNameInput" placeholder="مثلاً: سهرة الشباب" style="width:100%;margin-bottom:10px;">
       <button class="primary" id="createTripBtn" style="width:100%;margin-bottom:8px;justify-content:center;">${icon('sparkle')}إنشاء الطلعة</button>
-      <button class="sm ghost" id="backToSelectBtn" style="width:100%;">رجوع لقائمة الطلعات</button>
+      <button class="sm ghost" id="backToChooseBtn" style="width:100%;justify-content:center;">رجوع</button>
     </div>`;
   }
-  return `<div class="card" style="max-width:360px;margin:60px auto;text-align:center;">
-    <div style="display:flex;justify-content:center;color:var(--accent-text);margin-bottom:6px;">${icon('pot')}</div><h2 style="color:var(--accent-text);margin-bottom:6px;">سهرة</h2>
-    <div style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">اختر طلعتك وأدخل كودها</div>
-    ${tripsIndex.length ? `
+  if(landingMode === 'select'){
+    return `<div class="card" style="max-width:360px;margin:60px auto;text-align:center;">
+      <div style="display:flex;justify-content:center;color:var(--accent-text);margin-bottom:6px;">${icon('key')}</div><h2 style="color:var(--accent-text);margin-bottom:6px;">الدخول لطلعة</h2>
+      <div style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">اختر طلعتك وأدخل كودها</div>
       <label class="field-label" for="tripSelect" style="text-align:right;">اسم الطلعة</label>
       <select id="tripSelect" style="width:100%;margin-bottom:10px;">
         <option value="">اختر اسم الطلعة</option>
@@ -455,16 +454,24 @@ function renderLanding(){
       </select>
       <label class="field-label" for="tripCodeInput" style="text-align:right;">كود الطلعة</label>
       <input type="text" id="tripCodeInput" placeholder="كود الطلعة" maxlength="6" inputmode="numeric" style="width:100%;text-align:center;font-size:18px;letter-spacing:4px;margin-bottom:10px;">
-      <button class="primary" id="unlockBtn" style="width:100%;">دخول</button>
+      <button class="primary" id="unlockBtn" style="width:100%;margin-bottom:8px;justify-content:center;">${icon('lock')}دخول</button>
       <div id="lockError" style="color:var(--red);font-size:12.5px;margin:8px 0;">${esc(landingError)}</div>
-      <div style="font-size:12px;color:var(--text-dim);margin:10px 0;">— أو —</div>
-    ` : `<div class="empty" style="padding:0 0 14px;">ما فيه طلعات مسجّلة بعد على هذا الرابط</div>`}
-    <button class="sm" id="showCreateBtn" style="width:100%;justify-content:center;">${icon('plus')}إنشاء طلعة جديدة</button>
+      <button class="sm ghost" id="backToChooseBtn" style="width:100%;justify-content:center;">رجوع</button>
+    </div>`;
+  }
+  return `<div class="card" style="max-width:360px;margin:60px auto;text-align:center;">
+    <div style="display:flex;justify-content:center;color:var(--accent-text);margin-bottom:6px;">${icon('pot')}</div><h2 style="color:var(--accent-text);margin-bottom:6px;">سهرة</h2>
+    <div style="color:var(--text-dim);font-size:13px;margin-bottom:20px;">نظّم مناسباتكم الأسبوعية بكل سهولة</div>
+    ${tripsIndex.length ? `<button class="primary" id="goSelectBtn" style="width:100%;margin-bottom:10px;justify-content:center;">${icon('key')}لدي كود طلعة</button>` : ''}
+    <button class="${tripsIndex.length ? 'sm' : 'primary'}" id="goCreateBtn" style="width:100%;justify-content:center;">${icon('plus')}إنشاء طلعة جديدة</button>
   </div>`;
 }
 function attachLandingEvents(){
+  const backToChooseBtn = document.getElementById('backToChooseBtn');
+  if(backToChooseBtn){
+    backToChooseBtn.addEventListener('click', ()=>{ landingMode='choose'; landingError=''; render(); });
+  }
   if(landingMode === 'create'){
-    document.getElementById('backToSelectBtn').addEventListener('click', ()=>{ landingMode='select'; landingError=''; render(); });
     document.getElementById('createTripBtn').addEventListener('click', ()=>{
       const name = document.getElementById('newTripNameInput').value.trim();
       if(!name) return;
@@ -473,10 +480,8 @@ function attachLandingEvents(){
     setTimeout(()=>document.getElementById('newTripNameInput')?.focus(), 30);
     return;
   }
-  const showCreateBtn = document.getElementById('showCreateBtn');
-  showCreateBtn.addEventListener('click', ()=>{ landingMode='create'; landingError=''; render(); });
-  const unlockBtn = document.getElementById('unlockBtn');
-  if(unlockBtn){
+  if(landingMode === 'select'){
+    const unlockBtn = document.getElementById('unlockBtn');
     const tryUnlock = async ()=>{
       const tid = document.getElementById('tripSelect').value;
       const code = document.getElementById('tripCodeInput').value.trim();
@@ -495,7 +500,11 @@ function attachLandingEvents(){
     unlockBtn.addEventListener('click', tryUnlock);
     document.getElementById('tripCodeInput').addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
     setTimeout(()=>document.getElementById('tripSelect')?.focus(), 30);
+    return;
   }
+  const goSelectBtn = document.getElementById('goSelectBtn');
+  if(goSelectBtn) goSelectBtn.addEventListener('click', ()=>{ landingMode='select'; landingError=''; render(); });
+  document.getElementById('goCreateBtn').addEventListener('click', ()=>{ landingMode='create'; landingError=''; render(); });
 }
 
 function render(){
