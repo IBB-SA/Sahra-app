@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سهرة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #171A2B; --bg-deep:#10121E; --card:#21253D; --card-2:#2A2F4C;
+    --amber:#E8A33D; --amber-dim:#7A5A28; --coral:#D9694A; --green:#6FA97A;
+    --red:#D9534F; --text:#F3EFE4; --text-dim:#8B8FB0; --line:#33385A;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg-deep);color:var(--text);font-family:'Tajawal',sans-serif;min-height:100vh;}
+  h1,h2,h3{font-family:'Lalezar','Tajawal',sans-serif;font-weight:400;margin:0;}
+  .wrap{max-width:820px;margin:0 auto;padding:20px 16px 90px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .trip-name{font-size:30px;color:var(--amber);border:none;background:none;font-family:'Lalezar','Tajawal',sans-serif;outline:none;border-bottom:2px solid transparent;}
+  .trip-name:focus{border-color:var(--amber);}
+  .who-am-i{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim);}
+  select,input[type=text],input[type=number],input[type=date],input[type=tel],textarea{
+    font-family:'Tajawal',sans-serif;background:var(--bg);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:9px 11px;font-size:14px;outline:none;
+  }
+  select:focus,input:focus,textarea:focus{border-color:var(--amber);}
+  button{font-family:'Tajawal',sans-serif;cursor:pointer;border-radius:10px;padding:8px 14px;font-size:13.5px;
+    font-weight:500;border:1px solid var(--line);background:var(--card-2);color:var(--text);}
+  button:active{transform:scale(.97);}
+  button.primary{background:var(--amber);color:#3A2A0C;border-color:var(--amber);font-weight:700;}
+  button.danger{border-color:var(--red);color:var(--red);background:none;}
+  button.ghost{background:none;}
+  button.sm{padding:5px 10px;font-size:12.5px;}
+  .tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:0;}
+  .tab-btn{background:none;border:none;border-bottom:2px solid transparent;border-radius:0;padding:10px 6px;
+    color:var(--text-dim);white-space:nowrap;font-weight:500;}
+  .tab-btn.active{color:var(--amber);border-color:var(--amber);}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;}
+  .card h3{font-family:'Tajawal',sans-serif;font-weight:700;font-size:15px;color:var(--text-dim);margin-bottom:12px;}
+  .banner{background:linear-gradient(90deg,#3A2E15,#2C2A1E);border:1px solid var(--amber-dim);border-radius:14px;
+    padding:14px 16px;margin-bottom:16px;font-size:14px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .row.between{justify-content:space-between;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+  .badge.scheduled{background:#22314A;color:#7FB3E0;}
+  .badge.done{background:#1E3A26;color:var(--green);}
+  .badge.canceled{background:#3A2020;color:var(--red);}
+  .badge.postponed{background:#3A331A;color:var(--amber);}
+  .avatar{width:38px;height:38px;border-radius:50%;background:var(--amber);color:#3A2A0C;display:flex;
+    align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;}
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .avatar.sm{width:28px;height:28px;font-size:12px;}
+  .host-pair{display:flex;gap:10px;align-items:center;}
+  textarea.note{width:100%;min-height:70px;resize:vertical;line-height:1.6;}
+  .stars{display:flex;gap:4px;font-size:20px;cursor:pointer;}
+  .star{color:var(--line);}
+  .star.on{color:var(--amber);}
+  .occ-item{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;background:var(--card);}
+  .member-chip{background:var(--card-2);border:1px solid var(--line);border-radius:30px;padding:5px 10px 5px 5px;
+    display:flex;align-items:center;gap:8px;font-size:13.5px;}
+  .member-chip button{border:none;background:none;padding:2px 6px;color:var(--coral);font-size:15px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .empty{color:var(--text-dim);font-size:14px;text-align:center;padding:20px 0;}
+  label.field-label{font-size:12.5px;color:var(--text-dim);display:block;margin-bottom:4px;}
+  .field{margin-bottom:12px;}
+  .rsvp-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .rsvp-chip{border-radius:20px;padding:5px 12px;font-size:12.5px;border:1px solid var(--line);}
+  .rsvp-chip.yes{background:#1E3A26;color:var(--green);border-color:var(--green);}
+  .rsvp-chip.no{background:#3A2020;color:var(--red);border-color:var(--red);}
+  .rsvp-chip.pending{color:var(--text-dim);}
+  .pct-bar{height:8px;border-radius:6px;background:var(--line);overflow:hidden;margin:8px 0;}
+  .pct-fill{height:100%;background:var(--green);}
+  .kitty-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);}
+  .kitty-row:last-child{border-bottom:none;}
+  .photo-preview{max-width:100%;border-radius:12px;margin-top:10px;display:block;}
+  .restaurant-item{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;}
+  footer.note{text-align:center;color:var(--text-dim);font-size:12px;margin-top:24px;}
+  @media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="empty">... جاري التحميل</div></div>
+
+<script>
+const KEY = 'sahra-v2-data';
+let state = null;
+let currentUserId = null;
+let currentTab = 'home';
+let homeOccId = null;
+const WEEKDAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const imageCache = {};
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function addDays(iso,d){ const x=new Date(iso+'T00:00:00'); x.setDate(x.getDate()+d); return x.toISOString().slice(0,10); }
+function addMonths(iso,m){ const x=new Date(iso+'T00:00:00'); x.setMonth(x.getMonth()+m); return x.toISOString().slice(0,10); }
+function fmtDate(iso){ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('ar-SA',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+function fmtShort(iso){ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('ar-SA',{day:'numeric',month:'short'}); }
+function daysUntil(iso){ const a=new Date(todayISO()+'T00:00:00'); const b=new Date(iso+'T00:00:00'); return Math.round((b-a)/86400000); }
+function esc(s){ const d=document.createElement('div'); d.innerText=s==null?'':String(s); return d.innerHTML; }
+function escAttr(s){ return esc(s).replace(/"/g,'&quot;'); }
+
+function defaultState(){
+  return {
+    tripName:'سهرة الأصدقاء',
+    members:[], hostPairs:[],
+    frequency:'weekly', preferredWeekday:5, scheduleStartDate: todayISO(),
+    excludedPeriods:[], occasions:[], restaurants:[]
+  };
+}
+
+async function loadState(){
+  try{
+    const res = await window.storage.get(KEY, true);
+    state = res && res.value ? JSON.parse(res.value) : defaultState();
+  }catch(e){ state = defaultState(); }
+  render();
+}
+async function saveState(){
+  try{ await window.storage.set(KEY, JSON.stringify(state), true); }
+  catch(e){ console.error('تعذر الحفظ', e); }
+}
+async function saveImage(key, dataUrl){
+  try{ await window.storage.set(key, dataUrl, true); imageCache[key]=dataUrl; }
+  catch(e){ console.error('تعذر حفظ الصورة', e); }
+}
+async function fetchImage(key){
+  if(imageCache[key]) return imageCache[key];
+  try{
+    const res = await window.storage.get(key, true);
+    if(res && res.value){ imageCache[key]=res.value; return res.value; }
+  }catch(e){}
+  return null;
+}
+function resizeImage(file, maxDim, quality, cb){
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      let w=img.width, h=img.height;
+      if(w>h){ if(w>maxDim){ h=h*maxDim/w; w=maxDim; } } else { if(h>maxDim){ w=w*maxDim/h; h=maxDim; } }
+      const canvas = document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      cb(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function memberName(id){ const m=state.members.find(x=>x.id===id); return m?m.name:'عضو محذوف'; }
+function memberById(id){ return state.members.find(x=>x.id===id); }
+function pairById(id){ return state.hostPairs.find(x=>x.id===id); }
+function pairLabel(pairId){
+  const p = pairById(pairId); if(!p) return 'غير محدد';
+  return p.memberIds.map(memberName).join(' و ');
+}
+function intervalDays(){ return state.frequency==='weekly'?7:state.frequency==='biweekly'?14:0; }
+function nextDate(iso){ return state.frequency==='monthly' ? addMonths(iso,1) : addDays(iso, intervalDays()); }
+function nextOccurrenceOfWeekday(fromIso, weekday){
+  let d = new Date(fromIso+'T00:00:00');
+  while(d.getDay() !== weekday) d.setDate(d.getDate()+1);
+  return d.toISOString().slice(0,10);
+}
+function isExcluded(iso){
+  return state.excludedPeriods.some(p => iso >= p.start && iso <= p.end);
+}
+
+function generateYearSchedule(){
+  if(state.hostPairs.length===0){ alert('كوّن أزواج معازيب أولاً من تبويب الأعضاء'); return; }
+  if(!confirm('سيتم حذف الجدول الحالي وتوليد جدول سنة كاملة جديدة. متأكد؟')) return;
+  state.occasions = [];
+  let date = nextOccurrenceOfWeekday(state.scheduleStartDate, state.preferredWeekday);
+  const endDate = addMonths(date, 12);
+  let pairIdx = 0, index = 0;
+  let guard = 0;
+  while(date < endDate && guard < 400){
+    guard++;
+    if(!isExcluded(date)){
+      state.occasions.push({
+        id: uid(), index, date,
+        hostPairId: state.hostPairs[pairIdx % state.hostPairs.length].id,
+        status:'scheduled', location:'',
+        inviteType:null, inviteMessage:'', inviteSent:false, responses:{},
+        cancelReason:'', apologyMessage:'',
+        hasPhoto:false, photoDate:'',
+        kitty:{ attendees:[], total:0, paid:{} },
+        rating:{ raters:{} }
+      });
+      pairIdx++; index++;
+    }
+    date = nextDate(date);
+  }
+  saveState(); render();
+}
+
+function upcomingOccasion(){
+  return state.occasions.filter(o=>o.status==='scheduled').sort((a,b)=>a.date.localeCompare(b.date))[0] || null;
+}
+function getHomeOcc(){
+  if(homeOccId){
+    const found = state.occasions.find(o=>o.id===homeOccId);
+    if(found) return found;
+  }
+  const up = upcomingOccasion();
+  homeOccId = up ? up.id : null;
+  return up;
+}
+function suggestedInvite(occ){
+  const names = pairLabel(occ.hostPairId);
+  const loc = occ.location ? ` عند ${occ.location}` : '';
+  return `هلا وغلا 🌙 الليلة سهرتنا${loc}، ${names} عازمينكم، لا تخلّوننا نستناكم!`;
+}
+function apologyText(occ){
+  const names = pairLabel(occ.hostPairId);
+  const reason = occ.cancelReason ? ` بسبب ${occ.cancelReason}` : '';
+  return `يا اهل الخير، نعتذر احنا (${names}) عن سهرة هالمرة${reason}، تراضوا علينا وربي يعوضكم خير 🙏`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  const app = document.getElementById('app');
+  let html = '';
+  html += `<div class="topbar">
+    <input class="trip-name" id="tripNameInput" value="${escAttr(state.tripName)}">
+    <div class="who-am-i">
+      أنا:
+      <select id="whoSelect">
+        <option value="">اختر اسمك</option>
+        ${state.members.map(m=>`<option value="${m.id}" ${currentUserId===m.id?'selected':''}>${esc(m.name)}</option>`).join('')}
+      </select>
+    </div>
+  </div>`;
+
+  html += `<div class="tabs">
+    ${tabBtn('home','الرئيسية')}${tabBtn('schedule','الجدول السنوي')}${tabBtn('members','الأعضاء والمعازيب')}
+    ${tabBtn('settings','الإعدادات')}${tabBtn('kitchen','المطبخ')}
+  </div>`;
+
+  html += `<div id="content"></div>`;
+  html += `<footer class="note">البيانات مشتركة بين كل من يفتح هذا الرابط داخل المجموعة</footer>`;
+  app.innerHTML = html;
+
+  document.getElementById('tripNameInput').addEventListener('change', e=>{ state.tripName=e.target.value||'سهرة الأصدقاء'; saveState(); });
+  document.getElementById('whoSelect').addEventListener('change', e=>{ currentUserId=e.target.value||null; renderContent(); });
+
+  document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>{ currentTab=b.dataset.tab; render(); }));
+
+  renderContent();
+}
+function tabBtn(id,label){ return `<button class="tab-btn ${currentTab===id?'active':''}" data-tab="${id}">${label}</button>`; }
+
+function renderContent(){
+  const c = document.getElementById('content');
+  if(currentTab==='home') c.innerHTML = renderHome();
+  else if(currentTab==='schedule') c.innerHTML = renderSchedule();
+  else if(currentTab==='members') c.innerHTML = renderMembers();
+  else if(currentTab==='settings') c.innerHTML = renderSettings();
+  else if(currentTab==='kitchen') c.innerHTML = renderKitchen();
+  attachContentEvents();
+  hydrateImages();
+}
+
+function renderHome(){
+  const occ = getHomeOcc();
+  if(!occ){
+    return `<div class="card"><div class="empty">ما فيه سهرة قادمة. روح لتبويب "الإعدادات" وولّد الجدول السنوي 👆</div></div>`;
+  }
+  const du = daysUntil(occ.date);
+  let html = '';
+  if(occ.status!=='scheduled'){
+    html += `<div class="row" style="margin-bottom:12px;">
+      <button class="sm" id="goNextBtn">الانتقال للسهرة القادمة ⬅</button>
+    </div>`;
+  }
+  if(occ.status==='scheduled' && du <= 4 && du >= 0){
+    html += `<div class="banner">🔔 تذكير: باقي <strong>${du===0?'اليوم':du+' يوم'}</strong> على سهرة <strong>${esc(pairLabel(occ.hostPairId))}</strong></div>`;
+  }
+  html += `<div class="card">
+    <h3>السهرة القادمة — الأسبوع ${occ.index+1}</h3>
+    <div class="row between">
+      <div class="host-pair">
+        ${pairById(occ.hostPairId).memberIds.map(mid=>avatarHtml(mid)).join('')}
+        <strong>${esc(pairLabel(occ.hostPairId))}</strong>
+      </div>
+      <span class="badge scheduled">${fmtShort(occ.date)}</span>
+    </div>
+    <div class="field" style="margin-top:14px;">
+      <label class="field-label">مكان السهرة</label>
+      <input type="text" id="locInput" value="${escAttr(occ.location)}" placeholder="مثلاً: الاستراحة، أو اسم مطعم">
+    </div>
+    <div class="row">
+      <button class="sm" id="saveLocBtn">حفظ المكان</button>
+      <button class="sm ghost" id="swapBtn">تبديل مع اللي بعدهم</button>
+    </div>
+  </div>`;
+
+  html += `<div class="card">
+    <h3>الدعوة والتصويت</h3>
+    <textarea class="note" id="inviteMsg" placeholder="اكتب رسالة الدعوة...">${esc(occ.inviteMessage || suggestedInvite(occ))}</textarea>
+    <div class="row" style="margin-top:8px;">
+      <button class="primary sm" id="sendAnnounceBtn">اعزم 📣</button>
+      <button class="sm" id="sendPollBtn">خذ رأيهم 🗳️</button>
+      <button class="danger sm" id="openCancelBtn">تأجيل / إلغاء</button>
+    </div>`;
+
+  if(occ.inviteSent){
+    const total = state.members.length;
+    const yes = Object.values(occ.responses).filter(r=>r==='yes').length;
+    const no = Object.values(occ.responses).filter(r=>r==='no').length;
+    const answered = yes+no;
+    const pct = answered? Math.round(yes/answered*100) : 0;
+    html += `<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px;">
+      <div style="font-size:13px;color:var(--text-dim);">${occ.inviteType==='poll'?'استفتاء: هل تُقام السهرة؟':'الرسالة أُرسلت — ردّ الأعضاء:'}</div>
+      <div class="pct-bar"><div class="pct-fill" style="width:${pct}%;"></div></div>
+      <div style="font-size:12.5px;color:var(--text-dim);">${yes} موافق · ${no} غير موافق · من أصل ${total}</div>
+      <div class="rsvp-list">
+        ${state.members.map(m=>{
+          const r = occ.responses[m.id];
+          const cls = r==='yes'?'yes':r==='no'?'no':'pending';
+          const status = r==='yes' ? 'تم الله يقويكم ✅' : r==='no' ? 'مرتبط والله ❌' : 'لم يرد بعد';
+          return `<span class="rsvp-chip ${cls}">${esc(m.name)}: ${status}</span>`;
+        }).join('')}
+      </div>
+      ${currentUserId ? `<div class="row" style="margin-top:10px;">
+        <button class="sm" style="border-color:var(--green);color:var(--green);" id="rsvpYes">تم الله يقويكم ✅</button>
+        <button class="sm" style="border-color:var(--red);color:var(--red);" id="rsvpNo">مرتبط والله ❌</button>
+      </div>` : `<div class="empty" style="padding:6px 0;">اختر اسمك بالأعلى عشان تقدر ترد</div>`}
+    </div>`;
+  }
+  html += `</div>`;
+
+  if(occ.status==='scheduled'){
+    html += `<div class="card">
+      <h3>توثيق السهرة</h3>
+      <input type="file" accept="image/*" id="photoInput">
+      ${occ.hasPhoto ? `<img class="photo-preview" data-photo-key="photo:${occ.id}" alt="صورة السهرة">
+        <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">وُثّقت بتاريخ ${fmtShort(occ.photoDate)}</div>` : ''}
+      <div class="row" style="margin-top:10px;">
+        <button class="primary sm" id="markDoneBtn">تحديد السهرة كمنتهية</button>
+      </div>
+    </div>`;
+  }
+
+  if(occ.status==='done'){
+    const share = occ.kitty.attendees.length ? (occ.kitty.total / occ.kitty.attendees.length).toFixed(1) : 0;
+    html += `<div class="card">
+      <h3>القطة 💰</h3>
+      <div class="field">
+        <label class="field-label">من حضر؟</label>
+        <div class="row">
+          ${state.members.map(m=>`<label style="display:flex;align-items:center;gap:5px;font-size:13px;">
+            <input type="checkbox" class="attendeeChk" value="${m.id}" ${occ.kitty.attendees.includes(m.id)?'checked':''}> ${esc(m.name)}
+          </label>`).join('')}
+        </div>
+      </div>
+      <div class="row">
+        <input type="number" id="kittyTotal" placeholder="المبلغ الإجمالي" value="${occ.kitty.total||''}" style="max-width:160px;">
+        <button class="sm" id="saveKittyBtn">حساب وحفظ</button>
+      </div>
+      ${occ.kitty.attendees.length ? `<div style="margin-top:12px;font-size:13px;color:var(--text-dim);">نصيب كل شخص: <strong style="color:var(--amber);">${share} ريال</strong></div>
+        <div style="margin-top:8px;">
+        ${occ.kitty.attendees.map(mid=>{
+          const paid = occ.kitty.paid[mid];
+          return `<div class="kitty-row">
+            <span>${esc(memberName(mid))}</span>
+            ${paid ? `<span style="color:var(--green);font-size:13px;">تم التحويل ✅ الله يعطيك العافية</span>`
+              : (currentUserId===mid ? `<button class="sm primary" data-pay="${mid}">تم التحويل</button>` : `<span style="color:var(--text-dim);font-size:12.5px;">لم يدفع بعد</span>`)}
+          </div>`;
+        }).join('')}
+        </div>` : ''}
+    </div>
+
+    <div class="card">
+      <h3>تقييم السهرة</h3>
+      ${currentUserId ? renderRatingInputs(occ) : `<div class="empty" style="padding:6px 0;">اختر اسمك بالأعلى عشان تقيّم</div>`}
+      ${renderRatingAverages(occ)}
+    </div>`;
+  }
+
+  if(occ.status==='canceled'){
+    html += `<div class="card">
+      <h3>رسالة الاعتذار</h3>
+      <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;">${esc(occ.apologyMessage)}</div>
+      <div class="row" style="margin-top:10px;">
+        <button class="sm" id="copyApologyBtn">نسخ الرسالة</button>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+function avatarHtml(mid){
+  const m = memberById(mid);
+  if(!m) return `<div class="avatar sm">؟</div>`;
+  if(m.hasAvatar){ return `<div class="avatar sm"><img data-photo-key="avatar:${m.id}" alt=""></div>`; }
+  return `<div class="avatar sm">${esc((m.name||'؟').slice(0,1))}</div>`;
+}
+
+function renderRatingInputs(occ){
+  const my = occ.rating.raters[currentUserId] || {place:0,vibe:0,food:0};
+  const cats = [['place','المكان'],['vibe','الجو'],['food','الأكل']];
+  return cats.map(([key,label])=>`
+    <div class="row between" style="padding:4px 0;">
+      <span style="font-size:13px;color:var(--text-dim);">${label}</span>
+      <div class="stars" data-rate-occ="${key}">
+        ${[1,2,3,4,5].map(n=>`<span class="star ${my[key]>=n?'on':''}" data-val="${n}">★</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function renderRatingAverages(occ){
+  const raters = Object.values(occ.rating.raters);
+  if(raters.length===0) return `<div class="empty" style="padding:10px 0 0;">لا يوجد تقييمات بعد</div>`;
+  const avg = key => (raters.reduce((s,r)=>s+(r[key]||0),0)/raters.length).toFixed(1);
+  return `<div style="margin-top:10px;font-size:13px;color:var(--text-dim);border-top:1px solid var(--line);padding-top:10px;">
+    المتوسط — المكان: <strong style="color:var(--amber);">${avg('place')}</strong> ·
+    الجو: <strong style="color:var(--amber);">${avg('vibe')}</strong> ·
+    الأكل: <strong style="color:var(--amber);">${avg('food')}</strong>
+  </div>`;
+}
+
+function renderSchedule(){
+  if(state.occasions.length===0) return `<div class="card"><div class="empty">لا يوجد جدول بعد. ولّده من الإعدادات.</div></div>`;
+  return state.occasions.map(occ=>{
+    const badge = occ.status==='scheduled'?'scheduled':occ.status==='done'?'done':occ.status==='canceled'?'canceled':'postponed';
+    const label = {scheduled:'قادمة',done:'انتهت',canceled:'ملغاة',postponed:'مؤجلة'}[occ.status];
+    return `<div class="occ-item">
+      <div class="row between">
+        <div><strong>الأسبوع ${occ.index+1}</strong> — ${esc(pairLabel(occ.hostPairId))}</div>
+        <span class="badge ${badge}">${label}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text-dim);margin-top:4px;">${fmtDate(occ.date)}${occ.location?' · '+esc(occ.location):''}</div>
+      ${occ.status==='postponed' ? `<div class="row" style="margin-top:8px;">
+        <input type="date" class="postponeDate" data-occ="${occ.id}" value="${occ.date}">
+        <button class="sm" data-confirm-postpone="${occ.id}">تأكيد التاريخ الجديد</button>
+      </div>`:''}
+      <div class="row" style="margin-top:8px;">
+        <button class="sm ghost" data-open-home="${occ.id}">فتح في الرئيسية</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMembers(){
+  let html = `<div class="card">
+    <h3>الأعضاء (${state.members.length})</h3>
+    <div class="row" style="margin-bottom:12px;">
+      ${state.members.map(m=>`<div class="member-chip">${avatarHtml(m.id)}<span>${esc(m.name)}</span><button data-rm-member="${m.id}">×</button></div>`).join('') || '<div class="empty" style="padding:0;">لا يوجد أعضاء</div>'}
+    </div>
+    <div class="row">
+      <input type="text" id="newMemberName" placeholder="اسم العضو">
+      <input type="file" accept="image/*" id="newMemberAvatar" style="max-width:180px;">
+      <button class="primary" id="addMemberBtn">إضافة</button>
+    </div>
+  </div>`;
+
+  html += `<div class="card">
+    <h3>المعازيب (أزواج التناوب)</h3>
+    <div style="margin-bottom:10px;">
+      ${state.hostPairs.map((p,i)=>`<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--line);">
+        <div class="host-pair">${p.memberIds.map(avatarHtml).join('')}<span>${i+1}. ${esc(pairLabel(p.id))}</span></div>
+        <button class="sm danger" data-rm-pair="${p.id}">حذف</button>
+      </div>`).join('') || '<div class="empty" style="padding:0;">لا يوجد أزواج بعد</div>'}
+    </div>
+    <div class="row">
+      <select id="pairMember1"><option value="">العضو الأول</option>${state.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>
+      <select id="pairMember2"><option value="">العضو الثاني</option>${state.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>
+      <button class="primary" id="addPairBtn">تكوين زوج معازيب</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);margin-top:8px;">ترتيب الأزواج هنا يحدد ترتيب الدور عند توليد جدول جديد.</div>
+  </div>`;
+  return html;
+}
+
+function renderSettings(){
+  return `<div class="card">
+    <h3>وتيرة السهرات</h3>
+    <div class="grid2">
+      <div class="field">
+        <label class="field-label">كل كم؟</label>
+        <select id="freqSelect">
+          <option value="weekly" ${state.frequency==='weekly'?'selected':''}>أسبوعيًا</option>
+          <option value="biweekly" ${state.frequency==='biweekly'?'selected':''}>كل أسبوعين</option>
+          <option value="monthly" ${state.frequency==='monthly'?'selected':''}>شهريًا</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">اليوم المفضل</label>
+        <select id="weekdaySelect">
+          ${WEEKDAYS.map((w,i)=>`<option value="${i}" ${state.preferredWeekday===i?'selected':''}>${w}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">تاريخ بداية الجدول</label>
+      <input type="date" id="startDateInput" value="${state.scheduleStartDate}">
+    </div>
+    <button class="primary" id="genScheduleBtn">توليد جدول السنة كاملة</button>
+  </div>
+
+  <div class="card">
+    <h3>استبعاد فترات (رمضان، الأعياد...)</h3>
+    ${state.excludedPeriods.map(p=>`<div class="row between" style="padding:6px 0;border-bottom:1px solid var(--line);">
+      <span>${esc(p.label)}: ${fmtShort(p.start)} – ${fmtShort(p.end)}</span>
+      <button class="sm danger" data-rm-excl="${p.id}">حذف</button>
+    </div>`).join('') || '<div class="empty" style="padding:0 0 10px;">لا يوجد فترات مستبعدة</div>'}
+    <div class="row" style="margin-top:10px;">
+      <input type="text" id="exclLabel" placeholder="اسم الفترة (رمضان مثلاً)" style="max-width:160px;">
+      <input type="date" id="exclStart">
+      <input type="date" id="exclEnd">
+      <button id="addExclBtn">إضافة</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="danger" id="resetAllBtn">تصفير كل بيانات المجموعة</button>
+  </div>`;
+}
+
+function renderKitchen(){
+  return `<div class="card">
+    <h3>قائمة المطاعم والأماكن</h3>
+    ${state.restaurants.map(r=>{
+      const avg = r.ratings.length ? (r.ratings.reduce((s,x)=>s+x.stars,0)/r.ratings.length).toFixed(1) : '—';
+      return `<div class="restaurant-item">
+        <div class="row between">
+          <strong>${esc(r.name)}</strong>
+          <span style="color:var(--amber);">★ ${avg}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text-dim);">${r.phone?esc(r.phone):''} ${r.notes?' · '+esc(r.notes):''}</div>
+        ${currentUserId ? `<div class="row" style="margin-top:8px;">
+          <div class="stars" data-rate-restaurant="${r.id}">
+            ${[1,2,3,4,5].map(n=>`<span class="star" data-val="${n}">★</span>`).join('')}
+          </div>
+        </div>`:''}
+      </div>`;
+    }).join('') || '<div class="empty">لا يوجد مطاعم مضافة بعد</div>'}
+    <div class="row" style="margin-top:10px;">
+      <input type="text" id="newRestName" placeholder="اسم المطعم">
+      <input type="tel" id="newRestPhone" placeholder="رقم التواصل">
+      <input type="text" id="newRestNotes" placeholder="ملاحظات">
+      <button class="primary" id="addRestBtn">إضافة</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- events ---------- */
+function attachContentEvents(){
+  const occ = upcomingOccasion();
+
+  const locInput = document.getElementById('locInput');
+  if(locInput){
+    document.getElementById('saveLocBtn').addEventListener('click', ()=>{ occ.location=locInput.value; saveState(); renderContent(); });
+    document.getElementById('swapBtn').addEventListener('click', ()=>{
+      const rest = state.occasions.filter(o=>o.status==='scheduled' && o.id!==occ.id).sort((a,b)=>a.date.localeCompare(b.date));
+      if(rest.length===0){ alert('لا يوجد سهرة تالية للتبديل معها'); return; }
+      const nextOcc = rest[0];
+      const tmp = occ.hostPairId; occ.hostPairId = nextOcc.hostPairId; nextOcc.hostPairId = tmp;
+      saveState(); renderContent();
+    });
+  }
+  const sendAnnounceBtn = document.getElementById('sendAnnounceBtn');
+  if(sendAnnounceBtn){
+    sendAnnounceBtn.addEventListener('click', ()=>{
+      occ.inviteMessage = document.getElementById('inviteMsg').value;
+      occ.inviteType='announce'; occ.inviteSent=true; occ.responses = occ.responses||{};
+      saveState(); renderContent();
+    });
+    document.getElementById('sendPollBtn').addEventListener('click', ()=>{
+      occ.inviteMessage = document.getElementById('inviteMsg').value;
+      occ.inviteType='poll'; occ.inviteSent=true; occ.responses = occ.responses||{};
+      saveState(); renderContent();
+    });
+    document.getElementById('openCancelBtn').addEventListener('click', ()=>{
+      const pick = prompt('اكتب "الغاء" لإلغاء السهرة نهائيًا، أو "تأجيل" لتغيير تاريخها');
+      if(pick === 'الغاء' || pick === 'إلغاء'){
+        const reason = prompt('سبب الإلغاء (اختياري):','') || '';
+        occ.status='canceled'; occ.cancelReason=reason; occ.apologyMessage=apologyText(occ);
+        saveState(); renderContent();
+      } else if(pick === 'تأجيل'){
+        occ.status='postponed';
+        saveState(); render();
+      }
+    });
+  }
+  const rsvpYes = document.getElementById('rsvpYes');
+  if(rsvpYes){
+    rsvpYes.addEventListener('click', ()=>{ occ.responses[currentUserId]='yes'; saveState(); renderContent(); });
+    document.getElementById('rsvpNo').addEventListener('click', ()=>{ occ.responses[currentUserId]='no'; saveState(); renderContent(); });
+  }
+  const photoInput = document.getElementById('photoInput');
+  if(photoInput){
+    photoInput.addEventListener('change', e=>{
+      const file = e.target.files[0]; if(!file) return;
+      resizeImage(file, 900, 0.7, dataUrl=>{
+        saveImage('photo:'+occ.id, dataUrl);
+        occ.hasPhoto = true; occ.photoDate = todayISO();
+        saveState(); renderContent();
+      });
+    });
+    document.getElementById('markDoneBtn').addEventListener('click', ()=>{ occ.status='done'; saveState(); renderContent(); });
+  }
+  const saveKittyBtn = document.getElementById('saveKittyBtn');
+  if(saveKittyBtn){
+    saveKittyBtn.addEventListener('click', ()=>{
+      const checked = Array.from(document.querySelectorAll('.attendeeChk:checked')).map(c=>c.value);
+      occ.kitty.attendees = checked;
+      occ.kitty.total = parseFloat(document.getElementById('kittyTotal').value) || 0;
+      checked.forEach(mid=>{ if(!(mid in occ.kitty.paid)) occ.kitty.paid[mid] = false; });
+      Object.keys(occ.kitty.paid).forEach(mid=>{ if(!checked.includes(mid)) delete occ.kitty.paid[mid]; });
+      saveState(); renderContent();
+    });
+  }
+  document.querySelectorAll('[data-pay]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      occ.kitty.paid[btn.getAttribute('data-pay')] = true;
+      saveState(); renderContent();
+    });
+  });
+  document.querySelectorAll('[data-rate-occ]').forEach(group=>{
+    group.querySelectorAll('.star').forEach(star=>{
+      star.addEventListener('click', ()=>{
+        if(!currentUserId) return;
+        const key = group.getAttribute('data-rate-occ');
+        const val = parseInt(star.getAttribute('data-val'));
+        if(!occ.rating.raters[currentUserId]) occ.rating.raters[currentUserId] = {place:0,vibe:0,food:0};
+        occ.rating.raters[currentUserId][key] = val;
+        saveState(); renderContent();
+      });
+    });
+  });
+  const copyApologyBtn = document.getElementById('copyApologyBtn');
+  if(copyApologyBtn){
+    copyApologyBtn.addEventListener('click', ()=>{
+      navigator.clipboard.writeText(occ.apologyMessage).then(()=>alert('تم نسخ الرسالة')).catch(()=>{});
+    });
+  }
+
+  document.querySelectorAll('.postponeDate').forEach(inp=>{
+    inp.addEventListener('change', ()=>{});
+  });
+  document.querySelectorAll('[data-open-home]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      homeOccId = btn.getAttribute('data-open-home');
+      currentTab = 'home';
+      render();
+    });
+  });
+  document.querySelectorAll('[data-confirm-postpone]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-confirm-postpone');
+      const o = state.occasions.find(x=>x.id===id);
+      const inp = document.querySelector(`.postponeDate[data-occ="${id}"]`);
+      o.date = inp.value; o.status='scheduled';
+      saveState(); render();
+    });
+  });
+
+  const addMemberBtn = document.getElementById('addMemberBtn');
+  if(addMemberBtn){
+    addMemberBtn.addEventListener('click', ()=>{
+      const nameInput = document.getElementById('newMemberName');
+      const name = nameInput.value.trim(); if(!name) return;
+      const fileInput = document.getElementById('newMemberAvatar');
+      const newId = uid();
+      const member = { id:newId, name, hasAvatar:false };
+      state.members.push(member);
+      const finish = ()=>{ saveState(); render(); };
+      if(fileInput.files[0]){
+        resizeImage(fileInput.files[0], 120, 0.7, dataUrl=>{
+          saveImage('avatar:'+newId, dataUrl);
+          member.hasAvatar = true;
+          finish();
+        });
+      } else finish();
+    });
+  }
+  document.querySelectorAll('[data-rm-member]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-rm-member');
+      if(!confirm('حذف هذا العضو؟')) return;
+      state.members = state.members.filter(m=>m.id!==id);
+      state.hostPairs = state.hostPairs.filter(p=>!p.memberIds.includes(id));
+      saveState(); render();
+    });
+  });
+  const addPairBtn = document.getElementById('addPairBtn');
+  if(addPairBtn){
+    addPairBtn.addEventListener('click', ()=>{
+      const a = document.getElementById('pairMember1').value;
+      const b = document.getElementById('pairMember2').value;
+      if(!a || !b || a===b){ alert('اختر عضوين مختلفين'); return; }
+      state.hostPairs.push({ id:uid(), memberIds:[a,b] });
+      saveState(); render();
+    });
+  }
+  document.querySelectorAll('[data-rm-pair]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.hostPairs = state.hostPairs.filter(p=>p.id!==btn.getAttribute('data-rm-pair'));
+      saveState(); render();
+    });
+  });
+
+  const freqSelect = document.getElementById('freqSelect');
+  if(freqSelect){
+    freqSelect.addEventListener('change', e=>{ state.frequency=e.target.value; saveState(); });
+    document.getElementById('weekdaySelect').addEventListener('change', e=>{ state.preferredWeekday=parseInt(e.target.value); saveState(); });
+    document.getElementById('startDateInput').addEventListener('change', e=>{ state.scheduleStartDate=e.target.value; saveState(); });
+    document.getElementById('genScheduleBtn').addEventListener('click', generateYearSchedule);
+    document.getElementById('addExclBtn').addEventListener('click', ()=>{
+      const label = document.getElementById('exclLabel').value.trim() || 'فترة مستبعدة';
+      const start = document.getElementById('exclStart').value;
+      const end = document.getElementById('exclEnd').value;
+      if(!start || !end){ alert('حدد تاريخ البداية والنهاية'); return; }
+      state.excludedPeriods.push({ id:uid(), label, start, end });
+      saveState(); render();
+    });
+    document.querySelectorAll('[data-rm-excl]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.excludedPeriods = state.excludedPeriods.filter(p=>p.id!==btn.getAttribute('data-rm-excl'));
+        saveState(); render();
+      });
+    });
+    document.getElementById('resetAllBtn').addEventListener('click', ()=>{
+      if(!confirm('هذا سيمسح كل بيانات المجموعة نهائيًا. متأكد؟')) return;
+      state = defaultState(); currentUserId=null; saveState(); render();
+    });
+  }
+
+  const goNextBtn = document.getElementById('goNextBtn');
+  if(goNextBtn){
+    goNextBtn.addEventListener('click', ()=>{ homeOccId = null; renderContent(); });
+  }
+
+  const addRestBtn = document.getElementById('addRestBtn');
+  if(addRestBtn){
+    addRestBtn.addEventListener('click', ()=>{
+      const name = document.getElementById('newRestName').value.trim(); if(!name) return;
+      const phone = document.getElementById('newRestPhone').value.trim();
+      const notes = document.getElementById('newRestNotes').value.trim();
+      state.restaurants.push({ id:uid(), name, phone, notes, ratings:[] });
+      saveState(); render();
+    });
+  }
+  document.querySelectorAll('[data-rate-restaurant]').forEach(group=>{
+    group.querySelectorAll('.star').forEach(star=>{
+      star.addEventListener('click', ()=>{
+        if(!currentUserId){ alert('اختر اسمك أولاً'); return; }
+        const rid = group.getAttribute('data-rate-restaurant');
+        const r = state.restaurants.find(x=>x.id===rid);
+        const val = parseInt(star.getAttribute('data-val'));
+        const existing = r.ratings.find(x=>x.memberId===currentUserId);
+        if(existing) existing.stars = val; else r.ratings.push({ memberId: currentUserId, stars: val });
+        saveState(); render();
+      });
+    });
+  });
+}
+
+function hydrateImages(){
+  document.querySelectorAll('img[data-photo-key]').forEach(async img=>{
+    const key = img.getAttribute('data-photo-key');
+    const url = await fetchImage(key);
+    if(url) img.src = url;
+  });
+}
+
+loadState();
+</script>
+</body>
+</html>
