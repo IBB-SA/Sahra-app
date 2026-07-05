@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --bg: #1B1E27; --bg-deep:#14161D; --card:#22252F; --card-2:#2B2F3B;
@@ -194,14 +196,42 @@ document.getElementById('retrySaveBtn').addEventListener('click', ()=>{
 
 const HAS_CLAUDE_STORAGE = (typeof window.storage !== 'undefined' && window.storage !== null);
 const LS_PREFIX = 'sahra:';
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyArcf7JKyiv6wL1eKLyiB5WCTZG7kxhqng",
+  authDomain: "sahra-67126.firebaseapp.com",
+  projectId: "sahra-67126",
+  storageBucket: "sahra-67126.firebasestorage.app",
+  messagingSenderId: "737846079703",
+  appId: "1:737846079703:web:c6eca57860a0f4e9b54092"
+};
+let firebaseDb = null;
+let HAS_FIREBASE = false;
+try{
+  if(!HAS_CLAUDE_STORAGE && typeof firebase !== 'undefined'){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    firebaseDb = firebase.firestore();
+    HAS_FIREBASE = true;
+  }
+}catch(e){ console.error('تعذر تهيئة Firebase', e); HAS_FIREBASE = false; }
+
 async function storageGet(key, shared){
   if(HAS_CLAUDE_STORAGE) return window.storage.get(key, shared);
+  if(shared && HAS_FIREBASE){
+    const doc = await firebaseDb.collection('sahra_kv').doc(key).get();
+    if(!doc.exists) throw new Error('not found');
+    return { key, value: doc.data().value, shared };
+  }
   const raw = localStorage.getItem(LS_PREFIX + key);
   if(raw === null) throw new Error('not found');
   return { key, value: raw, shared };
 }
 async function storageSetRaw(key, value, shared){
   if(HAS_CLAUDE_STORAGE) return window.storage.set(key, value, shared);
+  if(shared && HAS_FIREBASE){
+    await firebaseDb.collection('sahra_kv').doc(key).set({ value });
+    return { key, value, shared };
+  }
   localStorage.setItem(LS_PREFIX + key, value);
   return { key, value, shared };
 }
@@ -604,7 +634,7 @@ function render(){
   </div>`;
 
   html += `<div id="content"></div>`;
-  html += `<footer class="note">${HAS_CLAUDE_STORAGE ? 'البيانات مشتركة بين كل من يفتح هذا الرابط داخل المجموعة' : '⚠️ وضع محلي: بياناتك محفوظة بمتصفحك فقط، ما تتزامن مع أجهزة ثانية'}</footer>`;
+  html += `<footer class="note">${(HAS_CLAUDE_STORAGE || HAS_FIREBASE) ? 'البيانات مشتركة بين كل من يفتح هذا الرابط داخل المجموعة' : '⚠️ وضع محلي: بياناتك محفوظة بمتصفحك فقط، ما تتزامن مع أجهزة ثانية'}</footer>`;
   app.innerHTML = html;
 
   const tripNameInput = document.getElementById('tripNameInput');
