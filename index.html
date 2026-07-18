@@ -657,7 +657,17 @@ async function createNewTrip(name){
     showAlert('تعذر إنشاء الطلعة، تأكد من اتصالك بالنت وحاول مرة ثانية');
     return;
   }
-  tripsIndex.push({ id, name, code: newState.tripCode, createdAt: new Date().toISOString().slice(0,10) });
+  // Read fresh index from Firebase before adding to prevent overwriting other devices' entries
+  try{
+    const freshIdx = await storageGet(INDEX_KEY, true);
+    if(freshIdx && freshIdx.value){
+      const parsed = JSON.parse(freshIdx.value);
+      if(Array.isArray(parsed)) tripsIndex = parsed;
+    }
+  }catch(e){}
+  if(!tripsIndex.find(t=>t.id===id)){
+    tripsIndex.push({ id, name, code: newState.tripCode, createdAt: todayISO() });
+  }
   await saveTripsIndex();
   state = normalizeState(newState); currentTripId = id; currentUserId = null; isTripAdmin = true; unlocked = true; landingMode='choose';
   saveSession();
