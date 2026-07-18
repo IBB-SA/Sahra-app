@@ -495,6 +495,40 @@ async function loadSupportPhone(){
 }
 let adminTripsDetail = {};
 let adminStatsLoading = false;
+async function rebuildTripsIndex(){
+  showAlert('جارٍ البحث عن الطلعات في قاعدة البيانات...');
+  try{
+    if(!HAS_FIREBASE || !firebaseDb){
+      showAlert('هذه الميزة تتطلب اتصال Firebase'); return;
+    }
+    // scan all docs in sahra_kv for trip data keys
+    const snapshot = await firebaseDb.collection('sahra_kv').get();
+    const recovered = [];
+    snapshot.forEach(doc=>{
+      const key = doc.id;
+      if(!key.startsWith('sahra-trip:')) return;
+      try{
+        const data = JSON.parse(doc.data().value);
+        if(data && !data.deleted && data.tripName && data.tripCode){
+          const id = key.replace('sahra-trip:','');
+          // check if already in index
+          if(!tripsIndex.find(t=>t.id===id)){
+            recovered.push({ id, name: data.tripName, code: data.tripCode, createdAt: data.createdAt||'—' });
+          }
+        }
+      }catch(e){}
+    });
+    if(recovered.length === 0){
+      showAlert('ما وُجدت طلعات مفقودة. الفهرس يطابق قاعدة البيانات.'); return;
+    }
+    tripsIndex = [...tripsIndex, ...recovered];
+    await saveTripsIndex();
+    showAlert('تم استعادة '+recovered.length+' طلعة. اضغط "تحديث البيانات" لعرضها.');
+    loadAdminStats();
+  }catch(e){
+    showAlert('تعذرت الاستعادة: '+e.message);
+  }
+}
 async function loadAdminStats(){
   adminStatsLoading = true;
   render();
@@ -999,8 +1033,9 @@ function renderLanding(){
   if(landingMode === 'admin-panel' && adminMode){
     return `<div class="card" style="max-width:480px;margin:40px auto;">
       <h2 style="color:var(--accent-text);margin-bottom:4px;text-align:center;">${icon('settings')}لوحة الإدارة</h2>
-      <div style="text-align:center;margin-bottom:12px;">
+      <div style="text-align:center;margin-bottom:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
         <button class="sm ghost" id="refreshAdminBtn" style="font-size:12px;">${icon('refresh')}تحديث البيانات</button>
+        <button class="sm ghost" id="rebuildIndexBtn" style="font-size:12px;color:var(--red);">🔧 استعادة الطلعات المفقودة</button>
       </div>
       ${(()=>{
         const totalMembers = Object.values(adminTripsDetail).reduce((s,d)=>s+(d?d.members:0),0);
@@ -1086,6 +1121,8 @@ function attachLandingEvents(){
     backToChooseBtn.addEventListener('click', ()=>{ landingMode='choose'; landingError=''; landingFoundTrip=null; landingTripAdminMode=false; adminMode=false; render(); });
     const refreshAdminBtn = document.getElementById('refreshAdminBtn');
     if(refreshAdminBtn) refreshAdminBtn.addEventListener('click', ()=>{ adminTripsDetail={}; loadAdminStats(); });
+    const rebuildIndexBtn = document.getElementById('rebuildIndexBtn');
+    if(rebuildIndexBtn) rebuildIndexBtn.addEventListener('click', rebuildTripsIndex);
   }
   if(landingMode === 'create'){
     document.getElementById('createTripBtn').addEventListener('click', ()=>{
