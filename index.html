@@ -1328,30 +1328,32 @@ function render(){
     return;
   }
   let html = '';
-  html += `<div class="topbar" style="display:flex;align-items:center;gap:8px;padding:10px 0 14px;position:relative;">
-    <!-- Left: logout/login -->
-    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-      ${(isTripAdmin||currentUserId) ? `<button id="logoutBtn" title="تسجيل خروج" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:22px;padding:4px;line-height:1;display:flex;align-items:center;" aria-label="خروج">⏻</button>` : ''}
-      <button id="refreshPageBtn" title="تحديث" style="background:none;border:none;cursor:pointer;font-size:17px;padding:4px;color:var(--text-dim);">🔄</button>
+  html += `<div class="topbar">
+    <!-- Trip name row: center name, right side logout+refresh -->
+    <div style="display:flex;align-items:center;justify-content:center;position:relative;padding:4px 0 12px;min-height:44px;">
+      <!-- right icons -->
+      <div style="position:absolute;right:0;display:flex;align-items:center;gap:8px;">
+        <button id="refreshPageBtn" title="تحديث" style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:18px;padding:4px;display:flex;align-items:center;">🔄</button>
+        ${(isTripAdmin||currentUserId) ? `<button id="logoutBtn" title="تسجيل خروج" style="background:none;border:1.5px solid #dc2626;border-radius:50%;cursor:pointer;color:#dc2626;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:17px;">⏻</button>` : ''}
+      </div>
+      <!-- trip name center -->
+      <div style="text-align:center;">
+        ${isTripAdmin
+          ? `<input class="trip-name" id="tripNameInput" value="${escAttr(state.tripName)}" placeholder="اسم الطلعة" style="text-align:center;font-size:18px;font-weight:700;border:none;background:transparent;max-width:200px;">`
+          : `<span style="font-size:18px;font-weight:700;color:var(--text);">${esc(state.tripName)}</span>`}
+      </div>
     </div>
-    <!-- Center: trip name -->
-    <div style="flex:1;text-align:center;">
-      ${isTripAdmin
-        ? `<input class="trip-name" id="tripNameInput" value="${escAttr(state.tripName)}" placeholder="اسم الطلعة" style="text-align:center;font-size:17px;font-weight:700;border:none;background:transparent;width:100%;max-width:200px;">`
-        : `<span style="font-size:17px;font-weight:700;color:var(--text);">${esc(state.tripName)}</span>`}
+    <!-- User info row -->
+    <div class="who-am-i-row">
+      ${isTripAdmin ? `${icon('settings')}<strong style="color:var(--amber);">مسؤول الطلعة</strong>`
+      : currentUserId ? `<strong style="color:var(--amber);">${esc(memberName(currentUserId))}</strong>`
+      : `<select id="whoSelect"><option value="">اختر اسمك</option>${state.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>
+         <input type="tel" id="whoCodeInput" placeholder="رقم جوالك" style="max-width:120px;" maxlength="10" inputmode="tel">
+         <button class="sm primary" id="loginBtn">دخول</button>
+         <span id="loginError" style="color:var(--red);font-size:12.5px;"></span>`}
+      ${notifPermission==='default' ? `<button class="sm ghost" id="enableNotifBtn">${icon('bell')}فعّل التنبيهات</button>` : ''}
+      ${notifPermission==='granted' ? `<span style="font-size:12px;color:var(--text-dim);">${icon('bell')}مفعّلة</span>` : ''}
     </div>
-    <!-- Right: user info or login -->
-    <div style="flex-shrink:0;font-size:12.5px;color:var(--text-dim);text-align:left;max-width:140px;">
-      ${isTripAdmin ? `<span style="color:var(--amber);font-weight:600;">مسؤول</span>`
-      : currentUserId ? `<span style="color:var(--amber);font-weight:600;">${esc(memberName(currentUserId))}</span>`
-      : `<div class="row" style="gap:4px;flex-wrap:nowrap;">
-         <select id="whoSelect" style="font-size:12px;max-width:90px;"><option value="">اسمك</option>${state.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>
-         <input type="tel" id="whoCodeInput" placeholder="جوالك" style="font-size:12px;max-width:80px;" maxlength="10" inputmode="tel">
-         <button class="sm primary" id="loginBtn" style="font-size:12px;padding:5px 8px;">دخول</button>
-         </div>
-         <span id="loginError" style="color:var(--red);font-size:11px;"></span>`}
-    </div>
-    ${notifPermission==='default' ? `<button class="sm ghost" id="enableNotifBtn" style="font-size:11px;padding:4px 8px;">${icon('bell')}تنبيهات</button>` : ''}
   </div>`;
 
   html += `<div class="tabs">
