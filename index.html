@@ -330,6 +330,13 @@ function normalizeState(s){
   if(!Array.isArray(s.excludedPeriods)) s.excludedPeriods = [];
   if(!Array.isArray(s.restaurants)) s.restaurants = [];
   if(!s.occasionTime) s.occasionTime = '21:00';
+  s.occasions && s.occasions.forEach(o=>{
+    if(!o.kitty) o.kitty = { attendees:[], total:0, paid:{} };
+    if(!o.kitty.attendees) o.kitty.attendees = [];
+    if(!o.kitty.paid) o.kitty.paid = {};
+    if(!o.rating) o.rating = { raters:{} };
+    if(!o.rating.raters) o.rating.raters = {};
+  });
   if(!s.scheduleYear) s.scheduleYear = new Date().getFullYear();
   s.occasions.forEach(o=>{
     if(!o.kitty) o.kitty = { attendees:[], total:0, paid:{} };
@@ -1321,25 +1328,30 @@ function render(){
     return;
   }
   let html = '';
-  html += `<div class="topbar">
-    <div class="trip-name-field">
-      <label class="field-label" for="tripNameInput">اسم الطلعة</label>
-      <input class="trip-name" id="tripNameInput" value="${escAttr(state.tripName)}" placeholder="مثلاً: طلعة الشباب">
+  html += `<div class="topbar" style="display:flex;align-items:center;gap:8px;padding:10px 0 14px;position:relative;">
+    <!-- Left: logout/login -->
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+      ${(isTripAdmin||currentUserId) ? `<button id="logoutBtn" title="تسجيل خروج" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:22px;padding:4px;line-height:1;display:flex;align-items:center;" aria-label="خروج">⏻</button>` : ''}
+      <button id="refreshPageBtn" title="تحديث" style="background:none;border:none;cursor:pointer;font-size:17px;padding:4px;color:var(--text-dim);">🔄</button>
     </div>
-    <div class="who-am-i-row">
-      ${isTripAdmin ? `${icon('settings')} أنت مسجّل بصفة: <strong style="color:var(--amber);">مسؤول الطلعة</strong>
-        <button class="sm ghost" id="refreshPageBtn" style="gap:4px;">🔄 حدّث الصفحة</button>
-        <button class="sm ghost" id="logoutBtn">تسجيل خروج</button>`
-      : currentUserId ? `أنت مسجّل بصفة: <strong style="color:var(--amber);">${esc(memberName(currentUserId))}</strong>
-        <button class="sm ghost" id="refreshPageBtn" style="gap:4px;">🔄 حدّث الصفحة</button>
-        <button class="sm ghost" id="logoutBtn">تسجيل خروج</button>`
-      : `<select id="whoSelect"><option value="">اختر اسمك</option>${state.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>
-         <input type="tel" id="whoCodeInput" placeholder="رقم جوالك" style="max-width:130px;" maxlength="10" inputmode="tel">
-         <button class="sm primary" id="loginBtn">دخول</button>
-         <span id="loginError" style="color:var(--red);font-size:12.5px;"></span>`}
-      ${notifPermission==='default' ? `<button class="sm ghost" id="enableNotifBtn">${icon('bell')}فعّل التنبيهات</button>` : ''}
-      ${notifPermission==='granted' ? `<span style="font-size:12px;color:var(--text-dim);">${icon('bell')}التنبيهات مفعّلة</span>` : ''}
+    <!-- Center: trip name -->
+    <div style="flex:1;text-align:center;">
+      ${isTripAdmin
+        ? `<input class="trip-name" id="tripNameInput" value="${escAttr(state.tripName)}" placeholder="اسم الطلعة" style="text-align:center;font-size:17px;font-weight:700;border:none;background:transparent;width:100%;max-width:200px;">`
+        : `<span style="font-size:17px;font-weight:700;color:var(--text);">${esc(state.tripName)}</span>`}
     </div>
+    <!-- Right: user info or login -->
+    <div style="flex-shrink:0;font-size:12.5px;color:var(--text-dim);text-align:left;max-width:140px;">
+      ${isTripAdmin ? `<span style="color:var(--amber);font-weight:600;">مسؤول</span>`
+      : currentUserId ? `<span style="color:var(--amber);font-weight:600;">${esc(memberName(currentUserId))}</span>`
+      : `<div class="row" style="gap:4px;flex-wrap:nowrap;">
+         <select id="whoSelect" style="font-size:12px;max-width:90px;"><option value="">اسمك</option>${state.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>
+         <input type="tel" id="whoCodeInput" placeholder="جوالك" style="font-size:12px;max-width:80px;" maxlength="10" inputmode="tel">
+         <button class="sm primary" id="loginBtn" style="font-size:12px;padding:5px 8px;">دخول</button>
+         </div>
+         <span id="loginError" style="color:var(--red);font-size:11px;"></span>`}
+    </div>
+    ${notifPermission==='default' ? `<button class="sm ghost" id="enableNotifBtn" style="font-size:11px;padding:4px 8px;">${icon('bell')}تنبيهات</button>` : ''}
   </div>`;
 
   html += `<div class="tabs">
@@ -1453,7 +1465,7 @@ function renderHome(){
     html += `<div class="card">
       <h3>⚙️ وضع الطلعة</h3>
       <div style="display:flex;flex-direction:column;gap:8px;">
-        ${isTripAdmin ? `<button class="sm ghost" id="swapBtn" style="justify-content:flex-start;gap:10px;">${icon('swap')}<div><div style="font-weight:600;">تبديل مع اللي بعدهم</div><div style="font-size:11.5px;color:var(--text-dim);font-weight:400;">يبدّل ترتيب المعازيب</div></div></button>` : ''}
+        ${(isTripAdmin || iAmHost) ? `<button class="sm ghost" id="swapBtn" style="justify-content:flex-start;gap:10px;">${icon('swap')}<div><div style="font-weight:600;">تبديل الطلعة مع اللي بعدنا</div><div style="font-size:11.5px;color:var(--text-dim);font-weight:400;">يبدّل ترتيب المعازيب</div></div></button>` : ''}
         <button class="sm ghost" id="openPostponeBtn" style="justify-content:flex-start;gap:10px;">${icon('calendar')}<div><div style="font-weight:600;">تأجيل الطلعة</div><div style="font-size:11.5px;color:var(--text-dim);font-weight:400;">تغيير تاريخ الطلعة القادمة</div></div></button>
         <button class="sm" id="cancelOccBtn" style="justify-content:flex-start;gap:10px;border-color:var(--red);color:var(--red);">🚫<div><div style="font-weight:600;">إلغاء الطلعة</div><div style="font-size:11.5px;color:var(--text-dim);font-weight:400;">إلغاء نهائي مع إشعار الأعضاء</div></div></button>
         <button class="primary sm" id="markDoneBtn" style="justify-content:flex-start;gap:10px;">${icon('check')}<div><div style="font-weight:600;">تمت على خير</div><div style="font-size:11.5px;opacity:0.85;font-weight:400;">إغلاق الطلعة وتوثيقها</div></div></button>
@@ -1984,7 +1996,8 @@ function attachContentEvents(){
       occ.inviteAutoGenerated = true; delete weatherDraftCache[occ.id];
       saveState(); renderContent();
     });
-    document.getElementById('swapBtn').addEventListener('click', ()=>{
+    const swapBtnEl = document.getElementById('swapBtn');
+    if(swapBtnEl) swapBtnEl.addEventListener('click', ()=>{
       const rest = state.occasions.filter(o=>o.status==='scheduled' && o.id!==occ.id).sort((a,b)=>a.date.localeCompare(b.date));
       if(rest.length===0){ showAlert('لا يوجد طلعة تالية للتبديل معها'); return; }
       const nextOcc = rest[0];
